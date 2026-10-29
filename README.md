@@ -6,7 +6,7 @@ Sokoban, the classic block pushing game, is now available for the TI-84 Plus CE 
 Use the Arrow Keys to move, Mode to quit. Pushing all the boxes onto the indicators closes the game automatically.
 
 ## Downloading & Running
-You may go to my [https://github.com/jvan1234/Calcuban/releases/tag/Major](Releases) to download the latest binaries. Make sure to also install [https://yvantt.github.io/arTIfiCE/](arTIfiCE) (or equivalent) to run the binaries.
+You may go to my [Release](https://github.com/jvan1234/Calcuban/releases/tag/Major) to download the latest binaries. Make sure to also install [arTIfiCE](https://yvantt.github.io/arTIfiCE/) (or equivalent) to run the binaries.
 
 ## Making from Source
 If you have the CEDev toolchain installed, move to the root project directory and type:
