@@ -44,11 +44,18 @@ void Vector<T>::push_back(const T& val) {
 }
 
 template <typename T>
+T Vector<T>::pop_back() {
+    if (empty()) return T{};
+    size--;
+    return data[size];
+}
+
+template <typename T>
 T Vector<T>::at(int i) const
 {
     if (i > size || i < 0)
     {
-        return nullptr;
+        return data[0];
     }
     return data[i];
 }
@@ -66,4 +73,20 @@ int Vector<T>::index(const T& val) const
 template <typename T>
 int Vector<T>::length() const {
     return size;
+}
+
+template <typename T>
+void Vector<T>::set(int i, const T& val)
+{
+    if (i > size || i < 0)
+    {
+        return;
+    }
+    data[i] = val;
+}
+
+template <typename T>
+void Vector<T>::clear() {
+    size = 0;
+    allocateMemory(1);
 }

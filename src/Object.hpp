@@ -16,12 +16,16 @@ class Object {
         void grid_setY(short n_y);
         void grid_setPos(short n_x, short n_y);
         void move(Game::Direction dir);
+        void add_step(Game::Direction dir);
+        void undo_step();
+        int num_steps() const;
         bool touching(Object& other);
+        static Vector<Object*> objs;
     protected:
         short x;
         short y;
         short img_size;
         gfx_sprite_t* img;
-        static Vector<Object*> objs;
+        Vector<Game::Direction> prev_steps;
 };
 #endif

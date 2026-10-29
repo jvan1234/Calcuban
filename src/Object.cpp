@@ -14,6 +14,7 @@ Object::Object(gfx_sprite_t* new_img, short new_img_size)
     this->img_size = new_img_size;
 
     objs.push_back(this);
+    Vector<Game::Direction> prev_steps(1);
 }
 
 Object::Object(const Object& other)
@@ -25,6 +26,7 @@ Object::Object(const Object& other)
     this->img_size = other.img_size;
 
     objs.push_back(this);
+    Vector<Game::Direction> prev_steps(1);
 }
 
 void Object::draw()
@@ -71,6 +73,8 @@ void Object::move(Game::Direction dir)
         case Game::Direction::WEST:
             if (x > 0) x -= img_size;
             break;
+        default:
+            break;
     }
 }
 
@@ -93,4 +97,19 @@ void Object::grid_setPos(short n_x, short n_y)
 {
     x = img_size * n_x;
     y = img_size * n_y;
+}
+
+void Object::add_step(Game::Direction dir)
+{
+    prev_steps.push_back(dir);
+}
+
+void Object::undo_step()
+{
+    // Use last step for ref
+    move(Game::mirror_dir(prev_steps.pop_back()));
+}
+
+int Object::num_steps() const {
+    return prev_steps.length();
 }
