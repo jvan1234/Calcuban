@@ -6,6 +6,13 @@ Sokoban port for the TI-84 Plus CE Series!
 
 Sokoban, the classic block pushing game, is now available for the TI-84 Plus CE Series! I have not seen anyone make a port of the game yet, and I figured it'd be good to use what I've learned in my coding classes for a fun project.
 
+Here are the controls:
+| Key | Action |
+|---|---|
+| Arrows | Move |
+| 2nd | Undo |
+| Alpha | Reset |
+
 Use the Arrow Keys to move, Mode to quit. Pushing all the boxes onto the indicators closes the game automatically.
 
 ## Downloading & Running
