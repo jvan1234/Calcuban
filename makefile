@@ -1,0 +1,23 @@
+# ----------------------------
+# Makefile Options
+# ----------------------------
+
+NAME = SOKOBAN
+ICON = icon.png
+DESCRIPTION = "Sokoban Example for TI84+CE"
+COMPRESSED = NO
+
+CFLAGS = -Wall -Wextra -Oz
+CXXFLAGS = -Wall -Wextra -Oz
+
+# ----------------------------
+
+EXTRA_C_SOURCES = src/tilemap/tilemap.c
+
+# ----------------------------
+
+include $(shell cedev-config --makefile)
+
+# rule to convert CSV tilemap to C source file
+src/tilemap/tilemap.c: src/tilemap/tilemap.csv
+	@convbin -j csv -i $< -k c -o $@ -n tilemap_map
