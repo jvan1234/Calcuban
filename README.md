@@ -1,4 +1,7 @@
 # Calcuban
+
+<img width="320" height="240" alt="example" src="https://github.com/user-attachments/assets/3ee7b29d-cd35-4f22-98cb-a175dcbd108e" />
+
 Sokoban port for the TI-84 Plus CE Series!
 
 Sokoban, the classic block pushing game, is now available for the TI-84 Plus CE Series! I have not seen anyone make a port of the game yet, and I figured it'd be good to use what I've learned in my coding classes for a fun project.
