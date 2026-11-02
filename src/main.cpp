@@ -3,12 +3,13 @@
 #include <keypadc.h>
 #include <debug.h>
 #include <tice.h>
-#include "game/Game.hpp"
+// Compiled Graphics
 #include "gfx/box.h"
 #include "gfx/global_palette.h"
 #include "gfx/player.h"
+// Class + Other info
+#include "game/Game.hpp"
 #include "object/Object.hpp"
-#include "gfx/gfx.h"
 #include "game/Puzzles.hpp"
 
 uint8_t on_puzzle = 1;
@@ -16,19 +17,31 @@ Object** Boxes;
 Object* Player = nullptr;
 gfx_tilemap_t* cur_tilemap;
 
+/**
+ * TODO:
+ * I found a bug that I've been looking for forever by now. Heres how I replicated it:
+ * - Start by undoing a move where you push a box
+ * - Without letting go of the undo button, hold a direction
+ * - Release Undo, letting your character move
+ * - Undo back to when you pushed the box, the box will undo incorrectly!!
+ */
 
 void InitPuzzle(uint8_t puzzle_on)
 {
-    dbg_sprintf(dbgout, "Entered InitPuzzle...");
+    // Allocate memory for Boxes
     Boxes = new Object*[BoxNum(puzzle_on)];
+    // Set the tilemap pointer to the appropriate tilemap
     cur_tilemap = Puzzle(puzzle_on);
+    // Add all boxes to the puzzle tilemap
     for (int i = 0; i < BoxNum(puzzle_on); i++)
     {
         Boxes[i] = new Object(box, box_width);
         Boxes[i]->SetSpawn(BoxesPosX(puzzle_on)[i], BoxesPosY(puzzle_on)[i]);
     }
+    // FAILSAFE, if the Player is not NULL
     if (Player != nullptr)
     {
+        // Place the player on the tilemap, reset it from the original puzzle
         Player->SetSpawn(PlayerX(puzzle_on), PlayerY(puzzle_on));
         Player->Reset();
     }
@@ -59,14 +72,17 @@ int main()
 
     uint8_t goal_c = 0;
 
-
     do {
         kb_Scan();
+        // Fetches key press information
         arrow_keys = kb_Data[7];
         special_keys_1 = kb_Data[1];
         special_keys_2 = kb_Data[2];
+
+        // If the user entered a direction...
         if (arrow_keys & (kb_Up | kb_Down | kb_Left | kb_Right))
         {
+            // Find which direction they shall move in
             dir = Game::Direction::NONE;
             if (arrow_keys & kb_Down) {
                 dir = Game::Direction::SOUTH;
@@ -77,9 +93,11 @@ int main()
             } else if (arrow_keys & kb_Right) {
                 dir = Game::Direction::EAST;
             }
-
+            // Move the player, always consider it a valid move at first
             Player->Move(dir);
             valid_move = true;
+
+            // If the player hits a wall, its an invalid move. Reset it's position
             if (Player->OverlapsWall(cur_tilemap)) {
                 Player->Move(Game::mirror_dir(dir));
                 valid_move = false;
@@ -87,23 +105,18 @@ int main()
             // Now Check boxes
             for (int i = 0; i < BoxNum(on_puzzle); i++)
             {
-                if (!Boxes[i]) continue; // Skips if Boxes[i] does not exist
-                if (Boxes[i]->Overlaps(*Player)) Boxes[i]->Move(dir);
-                // Now check if its still overlapping anything
-                if (Boxes[i]->OverlapsAny()) {
-                    valid_move = false;
-                    Boxes[i]->Move(Game::mirror_dir(dir));
-                    Player->Move(Game::mirror_dir(dir));
-                    break;
-                }
-                if (Boxes[i]->OverlapsWall(cur_tilemap))
-                {
+                if (!Boxes[i]) continue; // Skips if Boxes[i] does not exist (failsafe)
+                if (Boxes[i]->Overlaps(*Player)) Boxes[i]->Move(dir); // If the box overlaps the player, move it with the player
+                // If the box overlaps an object or wall after moving with the player, its an invalid move and the box should be reset
+                // along with the player
+                if (Boxes[i]->OverlapsAny() || Boxes[i]->OverlapsWall(cur_tilemap)) { //
                     valid_move = false;
                     Boxes[i]->Move(Game::mirror_dir(dir));
                     Player->Move(Game::mirror_dir(dir));
                     break;
                 }
             }
+            // Only if the move still is valid, add the step done to all objects
             if (valid_move) {
                 for (int i = 0; i < Object::num_objs; i++)
                 {
@@ -117,58 +130,72 @@ int main()
             }
         }
 
-
+        // If the 2nd (undo) button is pressed
         if (special_keys_1 & kb_2nd)
         {
+            // All objects undo their last step
             for (int i = 0; i < Object::num_objs; i++)
             {
                 Object::objs[i]->UndoStep();
             }
         }
+        // If Alpha (reset) button is pressed
         if (special_keys_2 & kb_Alpha)
         {
+            // All objects return to their prev position and delete their undo history
             for (int i = 0; i < Object::num_objs; i++)
             {
                 Object::objs[i]->Reset();
             }
         }
 
+        // WIN CON CHECKING
+        // Count the number of boxes overlapping goal tiles
         goal_c = 0;
         for (int i = 0; i < BoxNum(on_puzzle); i++)
         {
-            if (Boxes[i]->OnTile(cur_tilemap) == 2) goal_c++;
+            if (Boxes[i]->OnTile(cur_tilemap) == WIN_TILE) goal_c++;
         }
+
+        // If the number of boxes on win_tiles is equal to the number of boxes in the level
         if (goal_c == BoxNum(on_puzzle)) {
+            // If there are more puzzles
             if (on_puzzle < NUM_PUZZLES)
             {
+                // Delete All boxes
                 for (int i = 0; i < BoxNum(on_puzzle); i++)
                 {
                     delete Boxes[i];
                     Boxes[i] = nullptr;
                 }
+                // Removes current Boxes array in prep for reinitialization
                 delete[] Boxes;
                 Boxes = nullptr;
 
-
+                // Move to the next puzzle
                 on_puzzle++;
                 InitPuzzle(on_puzzle);
-                Player->Reset();
             }
             else {
+                // Otherwise, the game has been finished "won"
                 won = true;
             }
 
         };
+
+        // DRAWING
         gfx_FillScreen(2);
         gfx_Tilemap_NoClip(cur_tilemap, 0, 0);
         Object::Draw();
         gfx_SwapDraw();
+        // WAITING
         while (!(os_GetCSC() || special_keys_1 & kb_Mode || won));
 
     } while (!(special_keys_1 & kb_Mode || won));
 
+    // Ends graphical process
     gfx_End();
-
+    // Deletes all objects from memory
     Object::End();
 
     return 0;

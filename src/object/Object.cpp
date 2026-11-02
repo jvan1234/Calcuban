@@ -1,8 +1,7 @@
 #include "Object.hpp"
 #include "game/Game.hpp"
-#include <cstddef>
+#include "game/Puzzles.hpp"
 #include <cstdint>
-#include <cstdlib>
 #include <graphx.h>
 #include <string.h>
 
@@ -57,12 +56,13 @@ Object::~Object()
 
 void Object::End() {
     delete[] objs;
+    objs = nullptr;
 }
 
 void Object::Draw() {
     for (int i = 0; i < num_objs; i++)
     {
-        gfx_TransparentSprite_NoClip(objs[i]->img, (int)(objs[i]->tile_x * objs[i]->img_width), objs[i]->tile_y * objs[i]->img_width);
+        gfx_TransparentSprite_NoClip(objs[i]->img, (int)(objs[i]->tile_x * objs[i]->img_width) + X_OFF, objs[i]->tile_y * objs[i]->img_width + Y_OFF);
     }
 }
 
@@ -106,7 +106,7 @@ bool Object::Overlaps(const Object &other) const
 
 bool Object::OverlapsWall(const gfx_tilemap_t *tilemap) const
 {
-    return gfx_GetTileMapped(tilemap, tile_x, tile_y) == WALL_INDEX;
+    return gfx_GetTileMapped(tilemap, tile_x, tile_y) == WALL_TILE;
 }
 
 void Object::SetSpawn(uint8_t x, uint8_t y)
@@ -143,6 +143,9 @@ void Object::UndoStep()
         num_prev_steps--;
         Move(Game::mirror_dir(prev_steps[num_prev_steps]));
         prev_steps[num_prev_steps] = Game::Direction::NONE;
+        // I assume the bug (mentioned in main.cpp) is caused by the MOVE leaving last_dir available
+        // Use invalid move as a last_dir reset
+        InvalidMove();
     }
 }
 
