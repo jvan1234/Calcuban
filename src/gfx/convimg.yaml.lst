@@ -1,0 +1,9 @@
+global_palette.h
+global_palette.c
+player.h
+player.c
+box.h
+box.c
+tileset.h
+tileset.c
+gfx.h
