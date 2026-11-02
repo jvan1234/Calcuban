@@ -1,6 +1,6 @@
 # Calcuban
 
-<img width="320" height="240" alt="example" src="https://github.com/user-attachments/assets/3ee7b29d-cd35-4f22-98cb-a175dcbd108e" />
+<img width="320" height="240" alt="example" src="https://github.com/user-attachments/assets/cc433677-1e62-403e-bdbc-766ce5e9be18" />
 
 Sokoban port for the TI-84 Plus CE Series!
 
