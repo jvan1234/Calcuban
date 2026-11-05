@@ -1,141 +1,131 @@
 #include "Puzzles.hpp"
+#include "gfx/tileset.h"
 #include <cstdint>
 #include <graphx.h>
 
-gfx_tilemap_t puzzle1_tilemap = {
-    .map = puzzle1_map,
-    .tiles = tileset_tiles,
-    .tile_height = TILE_WIDTH, // Square is W * W so this is fine right?
-    .tile_width = TILE_WIDTH,
-    .draw_height = 7,
-    .draw_width = 6,
-    .type_width = gfx_tile_16_pixel,
-    .type_height = gfx_tile_16_pixel,
-    .height = 7,
-    .width = 6,
-    .y_loc = Y_OFF,
-    .x_loc = X_OFF
-};
+uint8_t Puzzle::num_puzzles = 0;
+uint8_t* Puzzle::puzzles_box_num = new uint8_t[MAX_PUZZLES];
+uint8_t** Puzzle::puzzles_box_pos_x = new uint8_t*[MAX_PUZZLES];
+uint8_t** Puzzle::puzzles_box_pos_y = new uint8_t*[MAX_PUZZLES];
+uint8_t* Puzzle::puzzles_player_pos_x = new uint8_t[MAX_PUZZLES];
+uint8_t* Puzzle::puzzles_player_pos_y = new uint8_t[MAX_PUZZLES];
+gfx_tilemap_t** Puzzle::puzzles_tilemaps = new gfx_tilemap_t*[MAX_PUZZLES];
+
+void Puzzle::CreatePuzzle(gfx_tilemap_t *tilemap, const uint8_t& box_c, uint8_t *boxes_x, uint8_t* boxes_y, const uint8_t& player_x, const uint8_t& player_y)
+{
+    if (num_puzzles >= MAX_PUZZLES) return;
+    // Set a new tilemap
+    puzzles_box_num[num_puzzles] = box_c;
+    puzzles_box_pos_x[num_puzzles] = boxes_x;
+    puzzles_box_pos_y[num_puzzles] = boxes_y;
+    puzzles_tilemaps[num_puzzles] = tilemap;
+    puzzles_player_pos_x[num_puzzles] = player_x;
+    puzzles_player_pos_y[num_puzzles] = player_y;
+    // State the new number of puzzles
+    num_puzzles++;
+    return;
+}
+
+uint8_t* Puzzle::GetBoxesX(uint8_t puzzle_num)
+{
+    if ((puzzle_num - 1) < 0 || (puzzle_num - 1) >= num_puzzles) return nullptr;
+
+    return puzzles_box_pos_x[puzzle_num - 1];
+}
+
+uint8_t* Puzzle::GetBoxesY(uint8_t puzzle_num)
+{
+    if ((puzzle_num - 1) < 0 || (puzzle_num - 1) >= num_puzzles) return nullptr;
+    return puzzles_box_pos_y[puzzle_num - 1];
+}
+
+uint8_t Puzzle::GetBoxCount(uint8_t puzzle_num)
+{
+    if ((puzzle_num - 1) < 0 || (puzzle_num - 1) >= num_puzzles) return 0;
+    return puzzles_box_num[puzzle_num - 1];
+}
+
+uint8_t Puzzle::GetPlayerX(uint8_t puzzle_num)
+{
+    if ((puzzle_num - 1) < 0 || (puzzle_num - 1) >= num_puzzles) return 0;
+    return puzzles_player_pos_x[puzzle_num - 1];
+}
+
+uint8_t Puzzle::GetPlayerY(uint8_t puzzle_num)
+{
+    if ((puzzle_num - 1) < 0 || (puzzle_num - 1) >= num_puzzles) return 0;
+    return puzzles_player_pos_y[puzzle_num - 1];
+}
+
+gfx_tilemap_t* Puzzle::GetTilemap(uint8_t puzzle_num)
+{
+    if ((puzzle_num - 1) < 0 || (puzzle_num - 1) >= num_puzzles) return nullptr;
+    return puzzles_tilemaps[puzzle_num - 1];
+}
+
+uint8_t Puzzle::GetPuzzleCount() {
+    return num_puzzles;
+}
+
+void Puzzle::End() {
+    delete[] puzzles_box_num;
+    puzzles_box_num = nullptr;
+
+    delete[] puzzles_tilemaps;
+    puzzles_tilemaps = nullptr;
+
+    delete[] puzzles_box_pos_x;
+    puzzles_box_pos_x = nullptr;
+
+    delete[] puzzles_box_pos_y;
+    puzzles_box_pos_y = nullptr;
+
+    delete[] puzzles_player_pos_x;
+    puzzles_player_pos_x = nullptr;
+
+    delete [] puzzles_player_pos_y;
+    puzzles_player_pos_y = nullptr;
+}
+
+// Raw init
 uint8_t puzzle1_boxes_x[PUZZLE1_NUM_BOXES] = {1,3};
 uint8_t puzzle1_boxes_y[PUZZLE1_NUM_BOXES] = {3, 4};
 uint8_t puzzle1_player_x = 2;
 uint8_t puzzle1_player_y = 3;
 
-gfx_tilemap_t puzzle2_tilemap = {
-    .map = puzzle2_map,
-    .tiles = tileset_tiles,
-    .tile_height = TILE_WIDTH,
-    .tile_width = TILE_WIDTH,
-    .draw_height = 7,
-    .draw_width = 6,
-    .type_width = gfx_tile_16_pixel,
-    .type_height = gfx_tile_16_pixel,
-    .height = 7,
-    .width = 6,
-    .y_loc = Y_OFF,
-    .x_loc = X_OFF
-};
 uint8_t puzzle2_boxes_x[PUZZLE2_NUM_BOXES] = {2, 3, 3};
 uint8_t puzzle2_boxes_y[PUZZLE2_NUM_BOXES] = {3, 3, 4};
 uint8_t puzzle2_player_x = 3;
 uint8_t puzzle2_player_y = 2;
 
-gfx_tilemap_t puzzle3_tilemap = {
-    .map = puzzle3_map,
-    .tiles = tileset_tiles,
-    .tile_height = TILE_WIDTH,
-    .tile_width = TILE_WIDTH,
-    .draw_height = 6,
-    .draw_width = 9,
-    .type_width = gfx_tile_16_pixel,
-    .type_height = gfx_tile_16_pixel,
-    .height = 6,
-    .width = 9,
-    .y_loc = Y_OFF,
-    .x_loc = X_OFF
-};
+
 uint8_t puzzle3_boxes_x[PUZZLE3_NUM_BOXES] = {6, 6};
 uint8_t puzzle3_boxes_y[PUZZLE3_NUM_BOXES] = {2, 3};
 uint8_t puzzle3_player_x = 6;
 uint8_t puzzle3_player_y = 4;
 
-gfx_tilemap_t puzzle4_tilemap = {
-    .map = puzzle4_map,
-    .tiles = tileset_tiles,
-    .tile_height = TILE_WIDTH,
-    .tile_width = TILE_WIDTH,
-    .draw_height = 6,
-    .draw_width = 8,
-    .type_width = gfx_tile_16_pixel,
-    .type_height = gfx_tile_16_pixel,
-    .height = 6,
-    .width = 8,
-    .y_loc = Y_OFF,
-    .x_loc = X_OFF
-};
 uint8_t puzzle4_boxes_x[PUZZLE4_NUM_BOXES] = {3, 4, 5};
 uint8_t puzzle4_boxes_y[PUZZLE4_NUM_BOXES] = {2, 2, 2};
 uint8_t puzzle4_player_x = 6;
 uint8_t puzzle4_player_y = 2;
 
-gfx_tilemap_t puzzle5_tilemap = {
-    .map = puzzle5_map,
-    .tiles = tileset_tiles,
-    .tile_height = TILE_WIDTH,
-    .tile_width = TILE_WIDTH,
-    .draw_height = 7,
-    .draw_width = 8,
-    .type_width = gfx_tile_16_pixel,
-    .type_height = gfx_tile_16_pixel,
-    .height = 7,
-    .width = 8,
-    .y_loc = Y_OFF,
-    .x_loc = X_OFF
-};
+
 uint8_t puzzle5_boxes_x[PUZZLE5_NUM_BOXES] = {3, 4, 4, 5};
 uint8_t puzzle5_boxes_y[PUZZLE5_NUM_BOXES] = {3, 2, 4, 3};
 uint8_t puzzle5_player_x = 4;
 uint8_t puzzle5_player_y = 3;
 
-uint8_t puzzles_box_num[NUM_PUZZLES] = {PUZZLE1_NUM_BOXES, PUZZLE2_NUM_BOXES, PUZZLE3_NUM_BOXES, PUZZLE4_NUM_BOXES, PUZZLE5_NUM_BOXES};
-uint8_t* puzzles_boxes_x[NUM_PUZZLES] = {puzzle1_boxes_x, puzzle2_boxes_x, puzzle3_boxes_x, puzzle4_boxes_x, puzzle5_boxes_x};
-uint8_t* puzzles_boxes_y[NUM_PUZZLES] = {puzzle1_boxes_y, puzzle2_boxes_y, puzzle3_boxes_y, puzzle4_boxes_y, puzzle5_boxes_y};
-uint8_t puzzles_player_x[NUM_PUZZLES] = {puzzle1_player_x, puzzle2_player_x, puzzle3_player_x, puzzle4_player_x, puzzle5_player_x};
-uint8_t puzzles_player_y[NUM_PUZZLES] = {puzzle1_player_y, puzzle2_player_y, puzzle3_player_y, puzzle4_player_y, puzzle5_player_y};
+uint8_t puzzle6_boxes_x[PUZZLE6_NUM_BOXES] = {2, 3, 2};
+uint8_t puzzle6_boxes_y[PUZZLE6_NUM_BOXES] = {2, 2, 3};
+uint8_t puzzle6_player_x = 10;
+uint8_t puzzle6_player_y = 2;
 
-uint8_t* BoxesPosX(uint8_t puzzle_num) {
-    return puzzles_boxes_x[puzzle_num - 1];
-}
+uint8_t puzzle7_boxes_x[PUZZLE7_NUM_BOXES] = {3, 2, 4, 3, 2, 4};
+uint8_t puzzle7_boxes_y[PUZZLE7_NUM_BOXES] = {2, 3, 3, 4, 5, 5};
+uint8_t puzzle7_player_x = 3;
+uint8_t puzzle7_player_y= 5;
 
-uint8_t* BoxesPosY(uint8_t puzzle_num)
-{
-    return puzzles_boxes_y[puzzle_num - 1];
-}
-
-uint8_t BoxNum(uint8_t puzzle_num)
-{
-    return puzzles_box_num[puzzle_num - 1];
-}
-
-uint8_t PlayerX(uint8_t puzzle_num)
-{
-    return puzzles_player_x[puzzle_num - 1];
-}
-
-uint8_t PlayerY(uint8_t puzzle_num)
-{
-    return puzzles_player_y[puzzle_num - 1];
-}
-
-gfx_tilemap_t* Puzzle(uint8_t puzzle_num)
-{
-    switch (puzzle_num - 1)
-    {
-        case 0: return &puzzle1_tilemap;
-        case 1: return &puzzle2_tilemap;
-        case 2: return &puzzle3_tilemap;
-        case 3: return &puzzle4_tilemap;
-        case 4: return &puzzle5_tilemap;
-        default: return nullptr;
-    }
-}
+uint8_t puzzle8_boxes_x[PUZZLE8_NUM_BOXES] = {4, 5};
+uint8_t puzzle8_boxes_y[PUZZLE8_NUM_BOXES] = {2, 2};
+uint8_t puzzle8_player_x = 6;
+uint8_t puzzle8_player_y = 1;

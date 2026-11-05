@@ -1,8 +1,6 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
-#define WALL_INDEX 1
-
 namespace Game {
     enum class Direction {
         NONE,
