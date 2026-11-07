@@ -19,5 +19,5 @@ EXTRA_C_SOURCES = src/tilemap/tilemap.c
 include $(shell cedev-config --makefile)
 
 # rule to convert CSV tilemap to C source file
-src/tilemap/tilemap.c: src/tilemap/tilemap.csv
+src/tilemap/tilemap.c: src/tilemap/puzzle1.csv
 	@convbin -j csv -i $< -k c -o $@ -n tilemap_map

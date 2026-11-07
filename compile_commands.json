@@ -1,0 +1,41 @@
+[
+  {
+    "arguments": [
+      "/home/wiz-superstar/CEdev/bin/ez80-clang",
+      "-c",
+      "-emit-llvm",
+      "-nostdinc",
+      "-Xclang",
+      "-fforce-mangle-main-argc-argv",
+      "-fno-autolink",
+      "-fno-addrsig",
+      "-fno-threadsafe-statics",
+      "-fno-aligned-allocation",
+      "-mllvm",
+      "-profile-guided-section-prefix=false",
+      "-mllvm",
+      "-z80-gas-style",
+      "-ffunction-sections",
+      "-fdata-sections",
+      "-fno-math-errno",
+      "-D__TICE__=1",
+      "-isystem",
+      "/home/wiz-superstar/CEdev/include/c++",
+      "-isystem",
+      "/home/wiz-superstar/CEdev/include",
+      "-Isrc",
+      "-fno-exceptions",
+      "-fno-use-cxa-atexit",
+      "-Wall",
+      "-Wextra",
+      "-Oz",
+      "-DNDEBUG=1",
+      "-o",
+      "obj/src/main.cpp.bc",
+      "src/main.cpp"
+    ],
+    "directory": "/home/wiz-superstar/Programs/Calcuban_Recomp",
+    "file": "/home/wiz-superstar/Programs/Calcuban_Recomp/src/main.cpp",
+    "output": "/home/wiz-superstar/Programs/Calcuban_Recomp/obj/src/main.cpp.bc"
+  }
+]
